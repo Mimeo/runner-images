@@ -1,0 +1,13 @@
+
+trigger:
+- '*'
+
+pool:
+  vmImage: ubuntu-latest
+
+jobs:
+- template: image-generation-mimeo.yml
+  parameters:
+    image_type: windows2022
+    image_readme_name: Windows2022-Readme.md
+    image_template_name: windows-2022-mimeo.pkr.hcl
