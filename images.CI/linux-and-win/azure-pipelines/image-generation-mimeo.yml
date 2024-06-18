@@ -17,10 +17,6 @@ parameters:
   - name: image_readme_name
     type: string
 
-  - name: agent_pool
-    type: object
-    value: 'vmImage: ubuntu-latest'
-
   - name: variable_group_name
     type: string
     value: 'buildagent-2022-packer'
@@ -38,7 +34,8 @@ jobs:
   displayName: Image Generation (${{ parameters.image_type }})
   timeoutInMinutes: 600
   cancelTimeoutInMinutes: 30
-  pool: ${{ parameters.agent_pool }}
+  pool: 
+    vmImage: ubuntu-latest
   variables:
   - group: ${{ parameters.variable_group_name }}
 
