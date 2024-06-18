@@ -19,7 +19,7 @@ parameters:
 
   - name: variable_group_name
     type: string
-    value: 'buildagent-2022-packer'
+    default: 'buildagent-2022-packer'
 
   - name: create_release
     type: boolean
