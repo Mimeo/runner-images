@@ -23,16 +23,6 @@ if (-not (Test-Path $TemplatePath))
 $ImageTemplateName = [io.path]::GetFileName($TemplatePath).Split(".")[0]
 $InstallPassword = [System.GUID]::NewGuid().ToString().ToUpper()
 
-$SensitiveData = @(
-    'OSType',
-    'StorageAccountLocation',
-    'OSDiskUri',
-    'OSDiskUriReadOnlySas',
-    'TemplateUri',
-    'TemplateUriReadOnlySas',
-    ':  ->'
-)
-
 Write-Host "Show Packer Version"
 packer --version
 
@@ -60,10 +50,4 @@ packer build    -var "client_id=$ClientId" `
                 -color false `
                 -debug `
                 $TemplatePath `
-                
-        | Where-Object {
-            #Filter sensitive data from Packer logs
-            $currentString = $_
-            $sensitiveString = $SensitiveData | Where-Object { $currentString -match $_ }
-            $sensitiveString -eq $null
-        }
+         
