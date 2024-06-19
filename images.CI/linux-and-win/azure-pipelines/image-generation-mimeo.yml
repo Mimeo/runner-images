@@ -66,7 +66,7 @@ jobs:
     displayName: 'Build VM'
     inputs:
       targetType: filePath
-      filePath: c
+      filePath: ./images.CI/linux-and-win/build-image.ps1
       arguments: -ClientId $(ARM_CLIENT_ID) `
                  -ClientSecret $(ARM_CLIENT_SECRET) `
                  -TemplatePath $(TemplatePath) `
@@ -136,8 +136,8 @@ jobs:
     inputs:
       targetType: filePath
       filePath: ./images.CI/linux-and-win/cleanup.ps1
-      arguments: -TempResourceGroupName "$(TempResourceGroupName)" `
-                 -SubscriptionId $(AZURE_SUBSCRIPTION) `
-                 -ClientId $(CLIENT_ID) `
-                 -ClientSecret "$(ClientSecret)" `
-                 -TenantId $(AZURE_TENANT)
+      arguments: -TempResourceGroupName $(TEMP_RESOURCE_GROUP_NAME) `
+                 -SubscriptionId $(ARM_SUBSCRIPTION_ID) `
+                 -ClientId $(ARM_CLIENT_ID) `
+                 -ClientSecret $(ARM_CLIENT_SECRET) `
+                 -TenantId $(ARM_TENANT_ID)
