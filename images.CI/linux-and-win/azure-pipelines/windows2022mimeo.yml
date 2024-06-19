@@ -4,7 +4,7 @@ trigger:
     - '*' 
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: windows-latest
 
 jobs:
 - template: image-generation-mimeo.yml
