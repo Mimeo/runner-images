@@ -57,7 +57,6 @@ packer build    -var "client_id=$ClientId" `
                 -var "virtual_network_subnet_name=$VirtualNetworkSubnet" `
                 -var "virtual_network_subnet_name=$VirtualNetworkSubnet" `
                 -var "vm_size=$VMSize"
-                -color=false `
                 $TemplatePath `
         | Where-Object {
             #Filter sensitive data from Packer logs
