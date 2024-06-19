@@ -49,5 +49,5 @@ packer build    -var "client_id=$ClientId" `
                 -var "vm_size=$VMSize" `
                 -color false `
                 -debug `
-                $TemplatePath `
+                $TemplatePath
          
