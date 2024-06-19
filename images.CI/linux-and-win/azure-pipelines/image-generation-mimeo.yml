@@ -46,15 +46,6 @@ jobs:
     fetchDepth: 0
     fetchTags: false
 
-  - task: PowerShell@2
-    displayName: 'Download custom repository'
-    condition: and(ne(variables['CUSTOM_REPOSITORY_URL'], ''), ne(variables['CUSTOM_REPOSITORY_BRANCH'], ''))
-    inputs:
-      targetType: 'filePath'
-      filePath: ./images.CI/download-repo.ps1
-      arguments: -RepoUrl $(CUSTOM_REPOSITORY_URL) `
-                 -RepoBranch $(CUSTOM_REPOSITORY_BRANCH)
-
   - task: AzureCLI@2
     displayName: 'Set variables'
     inputs:
