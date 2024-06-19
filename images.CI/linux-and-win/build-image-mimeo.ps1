@@ -32,8 +32,10 @@ packer init $TemplatePath
 Write-Host "Validate packer template"
 packer validate -syntax-only $TemplatePath
 
-Write-Host "Build $ImageTemplateName VM"
+Write-Host "Validate $ImageTemplateName "
+packer validate $TemplatePath
 
+Write-Host "Build $ImageTemplateName VM"
 packer build    -var "client_id=$ClientId" `
                 -var "client_secret=$ClientSecret" `
                 -var "install_password=$InstallPassword" `
