@@ -33,6 +33,7 @@ Write-Host "Validate packer template"
 packer validate -syntax-only $TemplatePath
 
 Write-Host "Build $ImageTemplateName VM"
+
 packer build    -var "client_id=$ClientId" `
                 -var "client_secret=$ClientSecret" `
                 -var "install_password=$InstallPassword" `
@@ -45,7 +46,5 @@ packer build    -var "client_id=$ClientId" `
                 -var "virtual_network_name=$VirtualNetworkName" `
                 -var "virtual_network_resource_group_name=$VirtualNetworkRG" `
                 -var "virtual_network_subnet_name=$VirtualNetworkSubnet" `
-                -var "vm_size=$VMSize" `
-                -color false `
-                -debug `
+                -var "vm_size=$VMSize"
                 $TemplatePath
