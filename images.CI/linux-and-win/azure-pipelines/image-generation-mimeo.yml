@@ -58,7 +58,7 @@ jobs:
   - task: AzureCLI@2
     displayName: 'Set variables'
     inputs:
-      azureSubscription: $(ARM_SUBSCRIPTION_NAME)
+      azureSubscription: 'azure-mimeo-production'
       scriptType: 'pscore'
       scriptLocation: 'inlineScript'
       inlineScript: |
