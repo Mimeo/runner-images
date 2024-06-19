@@ -66,13 +66,13 @@ jobs:
     displayName: 'Build VM'
     inputs:
       targetType: filePath
-      filePath: ./images.CI/linux-and-win/build-image-mimeo.ps1
+      filePath: c
       arguments: -ClientId $(ARM_CLIENT_ID) `
-                 -ClientSecret "$(ARM_CLIENT_SECRET)" `
+                 -ClientSecret $(ARM_CLIENT_SECRET) `
                  -TemplatePath $(TemplatePath) `
-                 -ImageName "$(ManagedImageName)" `
+                 -ImageName $(ManagedImageName) `
                  -ImageResourceGroupName $(ARM_RESOURCE_GROUP) `
-                 -TempResourceGroupName "$(TEMP_RESOURCE_GROUP_NAME)" `
+                 -TempResourceGroupName $(TEMP_RESOURCE_GROUP_NAME) `
                  -SubscriptionId $(ARM_SUBSCRIPTION_ID) `
                  -TenantId $(ARM_TENANT_ID) `
                  -Location $(ARM_RESOURCE_LOCATION) `
