@@ -76,9 +76,6 @@ jobs:
                  -SubscriptionId $(ARM_SUBSCRIPTION_ID) `
                  -TenantId $(ARM_TENANT_ID) `
                  -Location $(ARM_RESOURCE_LOCATION) `
-                 -VirtualNetworkName $(VNET_NAME) `
-                 -VirtualNetworkRG $(VNET_RESOURCE_GROUP) `
-                 -VirtualNetworkSubnet $(VNET_SUBNET) `
                  -VMSize $(VM_SIZE)
 
     env:
