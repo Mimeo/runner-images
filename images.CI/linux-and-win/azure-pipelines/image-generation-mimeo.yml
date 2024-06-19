@@ -79,7 +79,7 @@ jobs:
                  -VirtualNetworkName $(VNET_NAME) `
                  -VirtualNetworkRG $(VNET_RESOURCE_GROUP) `
                  -VirtualNetworkSubnet $(VNET_SUBNET)`
-                 -VMSize $(VM_SIZE)
+                 -VMSize "$(VM_SIZE)"
 
     env:
       PACKER_LOG: 1
