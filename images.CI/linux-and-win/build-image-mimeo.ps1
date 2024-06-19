@@ -49,4 +49,3 @@ packer build    -var "client_id=$ClientId" `
                 -color false `
                 -debug `
                 $TemplatePath
-         
