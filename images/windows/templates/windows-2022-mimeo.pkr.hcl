@@ -100,7 +100,7 @@ variable "managed_image_resource_group_name" {
 
 variable "managed_image_storage_account_type" {
   type    = string
-  default = "Standard_LRS"
+  default = "Premium_LRS"
 }
 
 variable "object_id" {
