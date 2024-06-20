@@ -300,7 +300,24 @@
             { "name": "innosetup" },
             { "name": "jq" },
             { "name": "NuGet.CommandLine" },
-            { "name": "packer" }
+            { "name": "packer" },
+            {
+                "name": "strawberryperl" ,
+                "args": [ "--version", "5.32.1.1" ]
+            },
+            { "name": "pulumi" },
+            { "name": "tortoisesvn" },
+            { "name": "swig" },
+            { "name": "vswhere" },
+            {
+                "name": "julia",
+                "args": [ "--ia", "/DIR=C:\\Julia" ]
+            },
+            {
+                "name": "cmake.install",
+                "args": [ "--installargs", "ADD_CMAKE_TO_PATH=\"System\"" ]
+            },
+            { "name": "imagemagick" }
         ]
     },
     "node": {

@@ -76,7 +76,9 @@ jobs:
                  -SubscriptionId $(ARM_SUBSCRIPTION_ID) `
                  -TenantId $(ARM_TENANT_ID) `
                  -Location $(ARM_RESOURCE_LOCATION) `
-                 -VMSize $(VM_SIZE)
+                 -VMSize $(VM_SIZE) `
+                 -ImageSKU $(IMAGE_SKU) `
+                 -StorageType $(STORAGE_TYPE)
 
     env:
       PACKER_LOG: 1

@@ -90,7 +90,6 @@ variable "location" {
 
 variable "managed_image_name" {
   type    = string
-  default = "mimeo-buildAgent2022"
 }
 
 variable "managed_image_resource_group_name" {
@@ -100,7 +99,7 @@ variable "managed_image_resource_group_name" {
 
 variable "managed_image_storage_account_type" {
   type    = string
-  default = "Premium_LRS"
+  default = "${env("STORAGE_TYPE")}"
 }
 
 variable "object_id" {
@@ -148,6 +147,11 @@ variable "vm_size" {
   default = "${env("VM_SIZE")}"
 }
 
+variable "image_sku" {
+  type    = string
+  default = "${env("IMAGE_SKU")}"
+}
+
 source "azure-arm" "image" {
   allowed_inbound_ip_addresses           = "${var.allowed_inbound_ip_addresses}"
   build_resource_group_name              = "${var.build_resource_group_name}"
@@ -157,7 +161,7 @@ source "azure-arm" "image" {
   communicator                           = "winrm"
   image_offer                            = "WindowsServer"
   image_publisher                        = "MicrosoftWindowsServer"
-  image_sku                              = "2022-datacenter-g2"
+  image_sku                              = "${var.image_sku}"
   location                               = "${var.location}"
   managed_image_name                     = "${local.managed_image_name}"
   managed_image_resource_group_name      = "${var.managed_image_resource_group_name}"

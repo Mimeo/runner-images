@@ -40,4 +40,6 @@ packer build    -var client_id=$ClientId `
                 -var temp_resource_group_name=$TempResourceGroupName `
                 -var tenant_id=$TenantId `
                 -var vm_size=$VMSize `
+                -var image_sku=$ImageSKU `
+                -var managed_image_storage_account_type=$StorageType `
                 $TemplatePath
