@@ -62,7 +62,7 @@ jobs:
         Write-Host "##vso[task.setvariable variable=TemplateDirectoryPath;]$TemplateDirectoryPath"
         Write-Host "##vso[task.setvariable variable=TemplatePath;]$TemplatePath"
         
-        az group create --name $(ARM_RESOURCE_GROUP)
+        az group create --name $(ARM_RESOURCE_GROUP) --location $(ARM_RESOURCE_LOCATION)
 
 
   - task: PowerShell@2
