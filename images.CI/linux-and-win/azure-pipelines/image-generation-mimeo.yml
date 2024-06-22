@@ -49,7 +49,7 @@ jobs:
   - task: AzureCLI@2
     displayName: 'Set variables'
     inputs:
-      azureSubscription: 'azure-mimeo-production'
+      azureSubscription: 'lz-mimeo-devops'
       scriptType: 'pscore'
       scriptLocation: 'inlineScript'
       inlineScript: |
@@ -61,6 +61,9 @@ jobs:
         $TemplatePath = Join-Path $TemplateDirectoryPath $TemplateFileName
         Write-Host "##vso[task.setvariable variable=TemplateDirectoryPath;]$TemplateDirectoryPath"
         Write-Host "##vso[task.setvariable variable=TemplatePath;]$TemplatePath"
+        
+        az group create --name $(ARM_RESOURCE_GROUP)
+
 
   - task: PowerShell@2
     displayName: 'Build VM'
@@ -83,42 +86,6 @@ jobs:
     env:
       PACKER_LOG: 1
       PACKER_LOG_PATH: "$(Agent.TempDirectory)/packer-log.txt"
-
-  - task: PowerShell@2
-    displayName: 'Copy image artifacts to the separate directory'
-    inputs:
-      targetType: 'inline'
-      script: |
-        $ImageType = "${{ parameters.image_type }}"
-        $rootDirectoryName = if ($ImageType.StartsWith("ubuntu")) { "ubuntu" } else { "windows" }
-        $rootDirectoryPath = Join-Path "images" $rootDirectoryName | Resolve-Path
-
-        $readmePath = Join-Path $rootDirectoryPath "${{ parameters.image_readme_name }}"
-        $softwareReportPath = Join-Path $rootDirectoryPath "software-report.json"
-
-        Copy-Item -Path $readmePath -Destination "$(Build.ArtifactStagingDirectory)/"
-        if (Test-Path $softwareReportPath) {
-            Copy-Item -Path $softwareReportPath -Destination "$(Build.ArtifactStagingDirectory)/"
-        }
-
-  - task: PublishBuildArtifacts@1
-    inputs:
-      ArtifactName: 'Built_VM_Artifacts'
-    displayName: Publish Artifacts
-
-  - ${{ if eq(parameters.create_release, true) }}:
-    - task: PowerShell@2
-      displayName: 'Create release for VM deployment'
-      inputs:
-        targetType: filePath
-        filePath: ./images.CI/linux-and-win/create-release.ps1
-        arguments: -BuildId $(Build.BuildId) `
-                   -Organization $(RELEASE_TARGET_ORGANIZATION) `
-                   -DefinitionId $(RELEASE_TARGET_DEFINITION_ID) `
-                   -Project $(RELEASE_TARGET_PROJECT) `
-                   -ImageType "${{ parameters.image_type }}" `
-                   -ManagedImageName "$(ManagedImageName)" `
-                   -AccessToken $(RELEASE_TARGET_TOKEN)
 
   - task: PowerShell@2
     displayName: 'Clean up resources'
