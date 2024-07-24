@@ -4,7 +4,7 @@ trigger:
     - '*' 
 
 pool:
-  name: "mimeo-win2019-vmss"
+  vmImage: ubuntu-latest
 
 jobs:
 - template: linux-image-generation-mimeo.yml
