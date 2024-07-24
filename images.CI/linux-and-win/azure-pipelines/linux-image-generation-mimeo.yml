@@ -69,7 +69,7 @@ jobs:
     displayName: 'Build VM'
     inputs:
       targetType: filePath
-      filePath: ./images.CI/linux-and-win/build-image-mimeo.ps1
+      filePath: ./images.CI/linux-and-win/linux-build-image-mimeo.ps1
       arguments: -ClientId $(ARM_CLIENT_ID) `
                  -ClientSecret $(ARM_CLIENT_SECRET) `
                  -TemplatePath $(TemplatePath) `
@@ -80,8 +80,7 @@ jobs:
                  -TenantId $(ARM_TENANT_ID) `
                  -Location $(ARM_RESOURCE_LOCATION) `
                  -VMSize $(VM_SIZE) `
-                 -ImageSKU $(IMAGE_SKU) `
-                 -StorageType $(STORAGE_TYPE)
+                 -ImageSKU $(IMAGE_SKU)
 
     env:
       PACKER_LOG: 1

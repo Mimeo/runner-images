@@ -1,0 +1,45 @@
+param(
+    [String] [Parameter (Mandatory=$true)] $TemplatePath,
+    [String] [Parameter (Mandatory=$true)] $ClientId,
+    [String] [Parameter (Mandatory=$true)] $ClientSecret,
+    [String] [Parameter (Mandatory=$true)] $Location,
+    [String] [Parameter (Mandatory=$true)] $ImageName,
+    [String] [Parameter (Mandatory=$true)] $ImageResourceGroupName,
+    [String] [Parameter (Mandatory=$true)] $TempResourceGroupName,
+    [String] [Parameter (Mandatory=$true)] $SubscriptionId,
+    [String] [Parameter (Mandatory=$true)] $TenantId,
+    [String] [Parameter (Mandatory=$false)] $VMSize,
+    [String] [Parameter (Mandatory=$false)] $ImageSKU,
+)
+
+if (-not (Test-Path $TemplatePath))
+{
+    Write-Error "'-TemplatePath' parameter is not valid. You have to specify correct Template Path"
+    exit 1
+}
+
+$ImageTemplateName = [io.path]::GetFileName($TemplatePath).Split(".")[0]
+$InstallPassword = [System.GUID]::NewGuid().ToString().ToUpper()
+
+Write-Host "Show Packer Version"
+packer --version
+
+Write-Host "Download packer plugins"
+packer init $TemplatePath
+
+Write-Host "Validate packer template"
+packer validate -syntax-only $TemplatePath
+
+Write-Host "Build $ImageTemplateName VM"
+packer build    -var client_id=$ClientId `
+                -var client_secret=$ClientSecret `
+                -var install_password=$InstallPassword `
+                -var location=$Location `
+                -var managed_image_name=$ImageName `
+                -var managed_image_resource_group_name=$ImageResourceGroupName `
+                -var subscription_id=$SubscriptionId `
+                -var temp_resource_group_name=$TempResourceGroupName `
+                -var tenant_id=$TenantId `
+                -var vm_size=$VMSize `
+                -var image_sku=$ImageSKU `
+                $TemplatePath
