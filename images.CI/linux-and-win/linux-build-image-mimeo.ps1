@@ -9,7 +9,7 @@ param(
     [String] [Parameter (Mandatory=$true)] $SubscriptionId,
     [String] [Parameter (Mandatory=$true)] $TenantId,
     [String] [Parameter (Mandatory=$false)] $VMSize,
-    [String] [Parameter (Mandatory=$false)] $ImageSKU,
+    [String] [Parameter (Mandatory=$false)] $ImageSKU
 )
 
 if (-not (Test-Path $TemplatePath))
