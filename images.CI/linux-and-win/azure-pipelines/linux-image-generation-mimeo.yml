@@ -20,7 +20,7 @@ parameters:
 
   - name: variable_group_name
     type: string
-    default: 'windows-buildagent-2022-packer'
+    default: 'linux-buildagent-2404-packer'
 
   - name: create_release
     type: boolean

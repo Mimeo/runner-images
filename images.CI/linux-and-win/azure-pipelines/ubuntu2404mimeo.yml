@@ -1,0 +1,14 @@
+trigger:
+  branches:
+    include:
+    - '*' 
+
+pool:
+  name: "mimeo-win2019-vmss"
+
+jobs:
+- template: linux-image-generation-mimeo.yml
+  parameters:
+    image_type: ubuntu2404
+    image_readme_name: Ubuntu2404-Readme.md
+    image_template_name: ubuntu-24.04-mimeo.pkr.hcl
