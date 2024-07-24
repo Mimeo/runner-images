@@ -105,7 +105,7 @@ variable "managed_image_resource_group_name" {
 
 variable "private_virtual_network_with_public_ip" {
   type    = bool
-  default = false
+  default = true
 }
 
 variable "subscription_id" {
@@ -140,7 +140,12 @@ variable "virtual_network_subnet_name" {
 
 variable "vm_size" {
   type    = string
-  default = "Standard_D4s_v4"
+  default = "${env("VM_SIZE")}"
+}
+
+variable "image_sku" {
+  type    = string
+  default = "${env("IMAGE_SKU")}"
 }
 
 source "azure-arm" "build_image" {
@@ -151,7 +156,7 @@ source "azure-arm" "build_image" {
   client_secret                          = "${var.client_secret}"
   image_offer                            = "ubuntu-24_04-lts"
   image_publisher                        = "canonical"
-  image_sku                              = "server-gen1"
+  image_sku                              = "${var.image_sku}"
   location                               = "${var.location}"
   managed_image_name                     = "${local.managed_image_name}"
   managed_image_resource_group_name      = "${var.managed_image_resource_group_name}"
