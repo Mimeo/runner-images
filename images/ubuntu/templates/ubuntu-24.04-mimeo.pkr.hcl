@@ -105,7 +105,7 @@ variable "managed_image_resource_group_name" {
 
 variable "private_virtual_network_with_public_ip" {
   type    = bool
-  default = true
+  default = false
 }
 
 variable "subscription_id" {
