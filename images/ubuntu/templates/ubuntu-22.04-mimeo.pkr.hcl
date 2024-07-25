@@ -155,7 +155,7 @@ source "azure-arm" "build_image" {
   client_cert_path                       = "${var.client_cert_path}"
   client_id                              = "${var.client_id}"
   client_secret                          = "${var.client_secret}"
-  image_offer                            = "ubuntu-22_04-lts"
+  image_offer                            = "0001-com-ubuntu-server-jammy"
   image_publisher                        = "canonical"
   image_sku                              = "${var.image_sku}"
   location                               = "${var.location}"
