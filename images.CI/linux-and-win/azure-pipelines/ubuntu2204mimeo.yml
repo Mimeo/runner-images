@@ -1,0 +1,14 @@
+trigger:
+  branches:
+    include:
+    - '*' 
+
+pool:
+  name: mimeo-win2022-vmss
+
+jobs:
+- template: linux-image-generation-mimeo.yml
+  parameters:
+    image_type: ubuntu2204
+    image_readme_name: Ubuntu2204-Readme.md
+    image_template_name: ubuntu-22.04-mimeo.pkr.hcl
