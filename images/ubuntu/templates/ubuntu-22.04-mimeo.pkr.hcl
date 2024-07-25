@@ -133,6 +133,12 @@ variable "virtual_network_resource_group_name" {
   default = "${env("VNET_RESOURCE_GROUP")}"
 }
 
+variable "virtual_network_subnet_name" {
+  type    = string
+  default = "${env("VNET_SUBNET")}"
+}
+
+
 variable "vm_size" {
   type    = string
   default = "${env("VM_SIZE")}"
