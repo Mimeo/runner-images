@@ -36,7 +36,7 @@ jobs:
   timeoutInMinutes: 600
   cancelTimeoutInMinutes: 30
   pool: 
-     vmImage: ubuntu-latest
+    name: mimeo-win2022-vmss
   variables:
   - group: ${{ parameters.variable_group_name }}
 
