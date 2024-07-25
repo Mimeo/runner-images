@@ -3,15 +3,19 @@ trigger:
     include:
     - '*' 
 
-pool:
-  name: mimeo-win2022-vmss
+jobs:
+- job: enableSSH
+  displayName: 'enableSSH'
+  pool:
+    name: mimeo-win2022-vmss
 
-steps:
-- task: PowerShell@2
-  inputs:
-    targetType: 'inline'
-    script: |
-      Get-WindowsCapability -Online | Where-Object Name -like 'OpenSSH*'
+  steps:
+
+  - task: PowerShell@2
+    inputs:
+      targetType: 'inline'
+      script: |
+        Get-WindowsCapability -Online | Where-Object Name -like 'OpenSSH*'
             
             # Install the OpenSSH Client
             Add-WindowsCapability -Online -Name OpenSSH.Client~~~~0.0.1.0
@@ -33,6 +37,10 @@ steps:
                 Write-Output "Firewall rule 'OpenSSH-Server-In-TCP' has been created and exists."
             }
      
+- job: createImage
+  displayName: 'createImage'
+  pool:
+    name: mimeo-win2022-vmss
 - template: linux-image-generation-mimeo.yml
   parameters:
     image_type: ubuntu2404
