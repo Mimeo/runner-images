@@ -39,6 +39,7 @@ jobs:
      
 - job: createImage
   displayName: 'createImage'
+  dependsOn: enableSSH
   pool:
     name: mimeo-win2022-vmss
 - template: linux-image-generation-mimeo.yml
