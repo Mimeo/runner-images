@@ -18,7 +18,7 @@ variable "allowed_inbound_ip_addresses" {
 
 variable "azure_tags" {
   type    = map(string)
-  default = {}
+  default = {"business" = "shared", "team" = "devops"}
 }
 
 variable "build_resource_group_name" {
