@@ -1,7 +1,7 @@
 #!/bin/bash -e
 ################################################################################
 ##  File:  install-swift.sh
-##  Desc:  Install Swift
+##  Desc:  Install Swift with improved GPG handling
 ################################################################################
 
 # Source the helpers for use with the script
@@ -17,27 +17,44 @@ archive_url="https://swift.org/builds/swift-${swift_version}-release/${image_lab
 archive_path=$(download_with_retry "$archive_url")
 
 # Verifying PGP signature using official Swift PGP key. Referring to https://www.swift.org/install/linux/#Installation-via-Tarball
-# Download and import Swift PGP keys
-gpg --keyserver hkp://keyserver.ubuntu.com \
-      --recv-keys \
-      '7463 A81A 4B2E EA1B 551F  FBCF D441 C977 412B 37AD' \
-      '1BE1 E29A 084C B305 F397  D62A 9F59 7F4D 21A5 6D5F' \
-      'A3BA FD35 56A5 9079 C068  94BD 63BC 1CFE 91D3 06C6' \
-      '5E4D F843 FB06 5D7F 7E24  FBA2 EF54 30F0 71E1 B235' \
-      '8513 444E 2DA3 6B7C 1659  AF4D 7638 F1FB 2B2B 08C4' \
-      'A62A E125 BBBF BB96 A6E0  42EC 925C C1CC ED3D 1561' \
-      '8A74 9566 2C3C D4AE 18D9  5637 FAF6 989E 1BC1 6FEA' \
-      'E813 C892 820A 6FA1 3755  B268 F167 DF1A CF9C E069'
-gpg --keyserver hkp://keyserver.ubuntu.com --refresh-keys Swift
+# Define Swift PGP keys
+swift_keys=(
+    '7463A81A4B2EEA1B551FFBCFD441C977412B37AD'
+    '1BE1E29A084CB305F397D62A9F597F4D21A56D5F'
+    'A3BAFD3556A59079C06894BD63BC1CFE91D306C6'
+    '5E4DF843FB065D7F7E24FBA2EF5430F071E1B235'
+    '8513444E2DA36B7C1659AF4D7638F1FB2B2B08C4'
+    'A62AE125BBBFBB96A6E042EC925CC1CCED3D1561'
+    '8A7495662C3CD4AE18D95637FAF6989E1BC16FEA'
+    'E813C892820A6FA13755B268F167DF1ACF9CE069'
+)
+
+# Attempt to fetch keys from keyserver with retries
+keyserver="hkps://keyserver.ubuntu.com"
+for key in "${swift_keys[@]}"; do
+    echo "Importing key: $key"
+    if ! gpg --keyserver "$keyserver" --recv-keys "$key"; then
+        echo "Failed to fetch key $key from $keyserver. Attempting manual import..."
+        curl -fsSL https://swift.org/keys/all-keys.asc | gpg --import || {
+            echo "Failed to import Swift GPG keys." >&2
+            exit 1
+        }
+    fi
+done
+
+gpg --keyserver "$keyserver" --refresh-keys Swift || echo "Warning: Failed to refresh Swift keys."
 
 # Download and verify signature
 signature_path=$(download_with_retry "${archive_url}.sig")
-gpg --verify "$signature_path" "$archive_path"
+if ! gpg --batch --verify "$signature_path" "$archive_path"; then
+    echo "Swift tarball signature verification failed!" >&2
+    exit 1
+fi
 
-# Remove Swift PGP public key with temporary keyring
+# Clean up Swift PGP public key with temporary keyring
 rm -rf ~/.gnupg
 
-# Extract and install swift
+# Extract and install Swift
 tar xzf "$archive_path" -C /tmp
 
 SWIFT_INSTALL_ROOT="/usr/share/swift"
