@@ -9,35 +9,11 @@
 source $HELPER_SCRIPTS/install.sh
 
 # Download KIND
-echo "Fetching latest KIND release..."
-
-# Fetch the latest release JSON from GitHub API
-kind_url=$(curl -s https://api.github.com/repos/kubernetes-sigs/kind/releases/latest \
-  | grep "browser_download_url" \
-  | grep "linux-amd64" \
-  | cut -d '"' -f 4)
-
-# Fallback if the filename format changed
-if [[ -z "$kind_url" ]]; then
-  echo "❗ Could not find the 'linux-amd64' binary. Checking for alternative formats..."
-  kind_url=$(curl -s https://api.github.com/repos/kubernetes-sigs/kind/releases/latest \
-    | grep "browser_download_url" \
-    | grep -E "amd64|x86_64" \
-    | cut -d '"' -f 4)
-
-  if [[ -z "$kind_url" ]]; then
-    echo "🚨 Failed to locate a suitable KIND binary."
-    exit 1
-  fi
-fi
-
-echo "✅ Found KIND binary: $kind_url"
-
-# Download KIND binary
-kind_binary_path=$(download_with_retry "$kind_url")
+kind_url=$(resolve_github_release_asset_url "kubernetes-sigs/kind" "endswith(\"kind-linux-amd64\")" "latest")
+kind_binary_path=$(download_with_retry "${kind_url}")
 
 # Supply chain security - KIND
-kind_external_hash=$(get_checksum_from_url "${kind_url}.sha256sum" "linux-amd64" "SHA256")
+kind_external_hash=$(get_checksum_from_url "${kind_url}.sha256sum" "kind-linux-amd64" "SHA256")
 use_checksum_comparison "${kind_binary_path}" "${kind_external_hash}"
 
 # Install KIND
