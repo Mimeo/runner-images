@@ -9,11 +9,25 @@
 source $HELPER_SCRIPTS/install.sh
 
 # Download KIND
-kind_url=$(resolve_github_release_asset_url "kubernetes-sigs/kind" "endswith(\"kind-linux-amd64\")" "latest")
-kind_binary_path=$(download_with_retry "${kind_url}")
+echo "Fetching latest KIND release..."
+
+# Fetch the latest release JSON from GitHub API and find any linux amd64 binary
+kind_url=$(curl -s https://api.github.com/repos/kubernetes-sigs/kind/releases/latest \
+  | grep -oP '"browser_download_url": "\K(https.*?linux.*?amd64.*?)"')
+
+# Fallback if no binary is found
+if [[ -z "$kind_url" ]]; then
+  echo "🚨 Failed to locate a suitable KIND binary."
+  exit 1
+fi
+
+echo "✅ Found KIND binary: $kind_url"
+
+# Download KIND binary
+kind_binary_path=$(download_with_retry "$kind_url")
 
 # Supply chain security - KIND
-kind_external_hash=$(get_checksum_from_url "${kind_url}.sha256sum" "kind-linux-amd64" "SHA256")
+kind_external_hash=$(get_checksum_from_url "${kind_url}.sha256sum" "$(basename $kind_url)" "SHA256")
 use_checksum_comparison "${kind_binary_path}" "${kind_external_hash}"
 
 # Install KIND
