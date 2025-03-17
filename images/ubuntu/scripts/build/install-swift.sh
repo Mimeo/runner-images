@@ -1,7 +1,7 @@
 #!/bin/bash -e
 ################################################################################
 ##  File:  install-swift.sh
-##  Desc:  Install Swift with improved GPG handling and verification
+##  Desc:  Install Swift with improved GPG handling, auto-key refresh, and verification
 ################################################################################
 
 # Source the helpers for use with the script
@@ -21,32 +21,23 @@ export GNUPGHOME="/tmp/gnupg"
 mkdir -p $GNUPGHOME
 chmod 700 $GNUPGHOME
 
-# Define Swift PGP keys
-swift_keys=(
-    '7463A81A4B2EEA1B551FFBCFD441C977412B37AD'
-    '1BE1E29A084CB305F397D62A9F597F4D21A56D5F'
-    'A3BAFD3556A59079C06894BD63BC1CFE91D306C6'
-    '5E4DF843FB065D7F7E24FBA2EF5430F071E1B235'
-    '8513444E2DA36B7C1659AF4D7638F1FB2B2B08C4'
-    'A62AE125BBBFBB96A6E042EC925CC1CCED3D1561'
-    '8A7495662C3CD4AE18D95637FAF6989E1BC16FEA'
-    'E813C892820A6FA13755B268F167DF1ACF9CE069'
-)
+# Fetch latest Swift keys with auto-refresh
+curl -fsSL https://swift.org/keys/all-keys.asc | gpg --import || {
+    echo "Failed to import Swift GPG keys." >&2
+    exit 1
+}
 
-# Fetch Swift keys with retries and manual fallback
-keyserver="hkps://keyserver.ubuntu.com"
-for key in "${swift_keys[@]}"; do
-    echo "Importing key: $key"
-    if ! gpg --keyserver "$keyserver" --recv-keys "$key"; then
-        echo "Failed to fetch key $key from $keyserver. Falling back to manual import..."
-        curl -fsSL https://swift.org/keys/all-keys.asc | gpg --import || {
-            echo "Failed to import Swift GPG keys." >&2
-            exit 1
-        }
-    fi
+# Ensure keys are refreshed and valid
+if ! gpg --keyserver hkps://keyserver.ubuntu.com --refresh-keys Swift; then
+    echo "Warning: Failed to refresh Swift keys. Trying backup refresh..."
+    curl -fsSL https://swift.org/keys/all-keys.asc | gpg --import
+fi
+
+# Trust new Swift keys explicitly
+for key in $(gpg --list-keys --with-colons | grep 'swift-infrastructure' | awk -F: '{print $5}'); do
+    echo "Setting ultimate trust for key: $key"
+    gpg --batch --yes --edit-key "$key" trust quit <<< "5"
 done
-
-gpg --keyserver "$keyserver" --refresh-keys Swift || echo "Warning: Failed to refresh Swift keys."
 
 # Download and verify signature
 signature_path=$(download_with_retry "${archive_url}.sig")
