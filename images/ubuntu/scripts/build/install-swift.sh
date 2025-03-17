@@ -1,7 +1,7 @@
 #!/bin/bash -e
 ################################################################################
 ##  File:  install-swift.sh
-##  Desc:  Install Swift with improved GPG handling
+##  Desc:  Install Swift with improved GPG handling and verification
 ################################################################################
 
 # Source the helpers for use with the script
@@ -15,8 +15,12 @@ swift_release_name="swift-${swift_version}-RELEASE-${image_label}"
 
 archive_url="https://swift.org/builds/swift-${swift_version}-release/${image_label//./}/swift-${swift_version}-RELEASE/${swift_release_name}.tar.gz"
 archive_path=$(download_with_retry "$archive_url")
-rm -rf ~/.gnupg
-# Verifying PGP signature using official Swift PGP key. Referring to https://www.swift.org/install/linux/#Installation-via-Tarball
+
+# Set up persistent GPG keyring to avoid CI/CD wipe issues
+export GNUPGHOME="/tmp/gnupg"
+mkdir -p $GNUPGHOME
+chmod 700 $GNUPGHOME
+
 # Define Swift PGP keys
 swift_keys=(
     '7463A81A4B2EEA1B551FFBCFD441C977412B37AD'
@@ -29,12 +33,12 @@ swift_keys=(
     'E813C892820A6FA13755B268F167DF1ACF9CE069'
 )
 
-# Attempt to fetch keys from keyserver with retries
+# Fetch Swift keys with retries and manual fallback
 keyserver="hkps://keyserver.ubuntu.com"
 for key in "${swift_keys[@]}"; do
     echo "Importing key: $key"
     if ! gpg --keyserver "$keyserver" --recv-keys "$key"; then
-        echo "Failed to fetch key $key from $keyserver. Attempting manual import..."
+        echo "Failed to fetch key $key from $keyserver. Falling back to manual import..."
         curl -fsSL https://swift.org/keys/all-keys.asc | gpg --import || {
             echo "Failed to import Swift GPG keys." >&2
             exit 1
@@ -46,13 +50,17 @@ gpg --keyserver "$keyserver" --refresh-keys Swift || echo "Warning: Failed to re
 
 # Download and verify signature
 signature_path=$(download_with_retry "${archive_url}.sig")
-if ! gpg --batch --verify "$signature_path" "$archive_path"; then
+
+# Detailed verification check with error handling
+if ! gpg --batch --verify --verbose "$signature_path" "$archive_path"; then
     echo "Swift tarball signature verification failed!" >&2
+    echo "Dumping GPG keyring for diagnostics:"
+    gpg --list-keys
     exit 1
 fi
 
 # Clean up Swift PGP public key with temporary keyring
-rm -rf ~/.gnupg
+rm -rf $GNUPGHOME
 
 # Extract and install Swift
 tar xzf "$archive_path" -C /tmp
