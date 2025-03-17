@@ -15,7 +15,7 @@ swift_release_name="swift-${swift_version}-RELEASE-${image_label}"
 
 archive_url="https://swift.org/builds/swift-${swift_version}-release/${image_label//./}/swift-${swift_version}-RELEASE/${swift_release_name}.tar.gz"
 archive_path=$(download_with_retry "$archive_url")
-
+rm -rf ~/.gnupg
 # Verifying PGP signature using official Swift PGP key. Referring to https://www.swift.org/install/linux/#Installation-via-Tarball
 # Define Swift PGP keys
 swift_keys=(
