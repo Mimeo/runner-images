@@ -9,11 +9,35 @@
 source $HELPER_SCRIPTS/install.sh
 
 # Download KIND
-kind_url=$(resolve_github_release_asset_url "kubernetes-sigs/kind" "endswith(\"kind-linux-amd64\")" "latest")
-kind_binary_path=$(download_with_retry "${kind_url}")
+echo "Fetching latest KIND release..."
+
+# Fetch the latest release JSON from GitHub API
+kind_url=$(curl -s https://api.github.com/repos/kubernetes-sigs/kind/releases/latest \
+  | grep "browser_download_url" \
+  | grep "linux-amd64" \
+  | cut -d '"' -f 4)
+
+# Fallback if the filename format changed
+if [[ -z "$kind_url" ]]; then
+  echo "❗ Could not find the 'linux-amd64' binary. Checking for alternative formats..."
+  kind_url=$(curl -s https://api.github.com/repos/kubernetes-sigs/kind/releases/latest \
+    | grep "browser_download_url" \
+    | grep -E "amd64|x86_64" \
+    | cut -d '"' -f 4)
+
+  if [[ -z "$kind_url" ]]; then
+    echo "🚨 Failed to locate a suitable KIND binary."
+    exit 1
+  fi
+fi
+
+echo "✅ Found KIND binary: $kind_url"
+
+# Download KIND binary
+kind_binary_path=$(download_with_retry "$kind_url")
 
 # Supply chain security - KIND
-kind_external_hash=$(get_checksum_from_url "${kind_url}.sha256sum" "kind-linux-amd64" "SHA256")
+kind_external_hash=$(get_checksum_from_url "${kind_url}.sha256sum" "linux-amd64" "SHA256")
 use_checksum_comparison "${kind_binary_path}" "${kind_external_hash}"
 
 # Install KIND
@@ -28,7 +52,7 @@ apt-get install kubectl
 rm -f /etc/apt/sources.list.d/kubernetes.list
 
 # Install Helm
-curl -fsSL https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+curl -fsSL https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
 
 # Download minikube
 curl -fsSL -O https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
@@ -41,7 +65,7 @@ use_checksum_comparison "minikube-linux-amd64" "${minikube_hash}"
 install minikube-linux-amd64 /usr/local/bin/minikube
 
 # Install kustomize
-download_url="https://raw.githubusercontent.com/kubernetes-sigs/kustomize/main/hack/install_kustomize.sh"
+download_url="https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
 curl -fsSL "$download_url" | bash
 mv kustomize /usr/local/bin
 
