@@ -4,32 +4,15 @@
 ##  Desc:  Installs kubectl, helm, kustomize
 ##  Supply chain security: KIND, minikube - checksum validation
 ################################################################################
-
 # Source the helpers for use with the script
 source $HELPER_SCRIPTS/install.sh
 
-# Fetch the latest KIND release
-echo "Fetching latest KIND release..."
-
-# Use jq for clean URL extraction
-# Fetch the latest release JSON from GitHub API and find any linux amd64 binary
-kind_url=$(curl -s https://api.github.com/repos/kubernetes-sigs/kind/releases/latest \
-  | jq -r '.assets[] | select(.name | test("linux.*amd64")) | .browser_download_url')
-
-# Fallback if no binary is found
-if [[ -z "$kind_url" ]]; then
-  echo "🚨 Failed to locate a suitable KIND binary."
-  exit 1
-fi
-
-echo "✅ Found KIND binary: $kind_url"
-
-
-# Download KIND binary
-kind_binary_path=$(download_with_retry "$kind_url")
+# Download KIND
+kind_url=$(resolve_github_release_asset_url "kubernetes-sigs/kind" "endswith(\"kind-linux-amd64\")" "latest")
+kind_binary_path=$(download_with_retry "${kind_url}")
 
 # Supply chain security - KIND
-kind_external_hash=$(get_checksum_from_url "${kind_url}.sha256sum" "$(basename $kind_url)" "SHA256")
+kind_external_hash=$(get_checksum_from_url "${kind_url}.sha256sum" "kind-linux-amd64" "SHA256")
 use_checksum_comparison "${kind_binary_path}" "${kind_external_hash}"
 
 # Install KIND
@@ -37,10 +20,10 @@ install "${kind_binary_path}" /usr/local/bin/kind
 
 ## Install kubectl
 kubectl_minor_version=$(curl -fsSL "https://dl.k8s.io/release/stable.txt" | cut -d'.' -f1,2 )
-curl -fsSL https://pkgs.k8s.io/core:/stable:/${kubectl_minor_version}/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
-echo "deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/${kubectl_minor_version}/deb/ /" | sudo tee /etc/apt/sources.list.d/kubernetes.list
+curl -fsSL https://pkgs.k8s.io/core:/stable:/$kubectl_minor_version/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/'$kubectl_minor_version'/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
 apt-get update
-apt-get install -y kubectl
+apt-get install kubectl
 rm -f /etc/apt/sources.list.d/kubernetes.list
 
 # Install Helm
