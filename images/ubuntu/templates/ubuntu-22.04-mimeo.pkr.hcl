@@ -316,7 +316,6 @@ build {
       "${path.root}/../scripts/build/install-leiningen.sh",
       "${path.root}/../scripts/build/install-miniconda.sh",
       "${path.root}/../scripts/build/install-mono.sh",
-      "${path.root}/../scripts/build/install-kotlin.sh",
       "${path.root}/../scripts/build/install-mysql.sh",
       "${path.root}/../scripts/build/install-mssql-tools.sh",
       "${path.root}/../scripts/build/install-sqlpackage.sh",
