@@ -12,16 +12,18 @@ source $HELPER_SCRIPTS/install.sh
 echo "Fetching latest KIND release..."
 
 # Use jq for clean URL extraction
-kind_url=$(curl -s https://api.github.com/repos/kubernetes-sigs/kind/releases/latest | jq -r '.assets[]? | select(.name | test("linux.*amd64$")) | .browser_download_url')
+# Fetch the latest release JSON from GitHub API and find any linux amd64 binary
+kind_url=$(curl -s https://api.github.com/repos/kubernetes-sigs/kind/releases/latest \
+  | jq -r '.assets[] | select(.name | test("linux.*amd64")) | .browser_download_url')
 
-if [[ -z "$kind_url" || "$kind_url" == "null" ]]; then
+# Fallback if no binary is found
+if [[ -z "$kind_url" ]]; then
   echo "🚨 Failed to locate a suitable KIND binary."
   exit 1
-else
-  echo "✅ Found KIND binary: $kind_url"
 fi
 
 echo "✅ Found KIND binary: $kind_url"
+
 
 # Download KIND binary
 kind_binary_path=$(download_with_retry "$kind_url")
