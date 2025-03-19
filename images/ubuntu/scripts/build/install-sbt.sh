@@ -1,7 +1,7 @@
 #!/bin/bash -e
 ################################################################################
 ##  File:  install-sbt.sh
-##  Desc:  Install sbt and verify version
+##  Desc:  Install sbt and ensure the version is properly reported
 ################################################################################
 
 source $HELPER_SCRIPTS/install.sh
@@ -12,12 +12,13 @@ archive_path=$(download_with_retry "$download_url")
 tar zxf "$archive_path" -C /usr/share
 ln -sf /usr/share/sbt/bin/sbt /usr/bin/sbt
 
-# Verify installation and version
+# Verify installation
 if ! command -v sbt &> /dev/null; then
     echo "❌ Sbt installation failed — command not found!"
     exit 1
 fi
 
+# Fetch Sbt version
 sbt_version=$(sbt --version | grep -oP '(?<=sbt ).*')
 if [[ -z "$sbt_version" ]]; then
     echo "❌ Failed to retrieve Sbt version!"
@@ -26,4 +27,8 @@ fi
 
 echo "✅ Sbt version $sbt_version installed successfully"
 
+# Register the version with the Azure pipeline tool version reporting
+echo "Sbt=$sbt_version" >> $HELPER_SCRIPTS/tool_versions.sh
+
 invoke_tests "Tools" "Sbt"
+
