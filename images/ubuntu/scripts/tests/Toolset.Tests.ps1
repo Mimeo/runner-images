@@ -33,45 +33,62 @@ Describe "Toolset" {
     }
 
     foreach ($tool in $tools) {
-        $toolName = $tool.Name
+    $toolName = $tool.Name
 
-        Context "$toolName" {
-            if (-not $tool.versions -or $tool.versions.Count -eq 0) {
-                Write-Warning "$toolName has no versions available. Skipping."
-                continue
+    Context "$toolName" {
+        if (-not $tool.versions -or $tool.versions.Count -eq 0) {
+            Write-Warning "$toolName has no versions available. Skipping."
+            continue
+        }
+
+        $toolExecs = $toolsExecutables[$toolName]
+
+        foreach ($version in $tool.versions) {
+            # Improved version padding
+            if ($version -notmatch "^\d+\.\d+\.\d+$") {
+                $version += ".*"
             }
 
-            $toolExecs = $toolsExecutables[$toolName]
+            $expectedVersionPath = Join-Path $env:AGENT_TOOLSDIRECTORY $toolName $version
 
-            foreach ($version in $tool.versions) {
-                # Handle partial versions
-                $version = if ($version -match "\d+\.\d+") { "$version.*" } else { $version }
-
-                $expectedVersionPath = Join-Path $env:AGENT_TOOLSDIRECTORY $toolName $version
-
-                It "$version version folder exists" -TestCases @{ ExpectedVersionPath = $expectedVersionPath } {
+            It "$version version folder exists" -TestCases @{ ExpectedVersionPath = $expectedVersionPath } {
+                if (Test-Path $ExpectedVersionPath) {
                     $ExpectedVersionPath | Should -Exist
+                } else {
+                    Write-Warning "Expected path '$ExpectedVersionPath' for $toolName version $version does not exist."
                 }
+            }
 
+            try {
                 $foundVersion = Get-Item $expectedVersionPath `
                     | Sort-Object -Property {[SemVer]$_.name} -Descending `
                     | Select-Object -First 1
+
+                if (-not $foundVersion) {
+                    throw "No valid version folder found for $toolName version $version"
+                }
+
                 $foundVersionPath = Join-Path $foundVersion $tool.arch
+            } catch {
+                Write-Warning "Failed to find valid version for $toolName ($version): $_"
+                continue
+            }
 
-                if ($toolExecs) {
-                    foreach ($executable in $toolExecs["tools"]) {
-                        $executablePath = Join-Path $foundVersionPath $executable
+            # Validate executables only if a valid version path is found
+            if ($toolExecs) {
+                foreach ($executable in $toolExecs["tools"]) {
+                    $executablePath = Join-Path $foundVersionPath $executable
 
-                        It "Validate $executable" -TestCases @{ ExecutablePath = $executablePath } {
-                            if (Test-Path $ExecutablePath) {
-                                $ExecutablePath | Should -Exist
-                            } else {
-                                Write-Warning "$executable for $toolName not found at $executablePath"
-                            }
+                    It "Validate $executable" -TestCases @{ ExecutablePath = $executablePath } {
+                        if (Test-Path $ExecutablePath) {
+                            $ExecutablePath | Should -Exist
+                        } else {
+                            Write-Warning "$executable for $toolName not found at $executablePath"
                         }
                     }
                 }
             }
         }
     }
+}
 }
