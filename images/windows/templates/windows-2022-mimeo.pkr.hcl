@@ -334,6 +334,7 @@ build {
       "${path.root}/../scripts/build/Configure-Diagnostics.ps1",
       "${path.root}/../scripts/build/Install-Vcpkg.ps1",
       "${path.root}/../scripts/build/Install-CodeQLBundle.ps1",
+      "${path.root}/../scripts/build/Install-Chrome.ps1",
     ]
   }
 
