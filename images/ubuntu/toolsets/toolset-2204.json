@@ -64,7 +64,17 @@
             "versions": [
                 "*"
             ]
-        }
+        },
+        {
+           "name": "Sbt",
+           "url": "https://github.com/sbt/sbt/releases",
+           "platform": "linux",
+           "arch": "x64",
+           "versions": [
+              "1.9.7"  // Use the latest stable version or the one you need
+            ]
+}
+
     ],
     "java": {
         "default": "11",
