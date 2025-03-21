@@ -4,62 +4,46 @@
 ##  Desc:  Installs kubectl, helm, kustomize
 ##  Supply chain security: KIND, minikube - checksum validation
 ################################################################################
+
 # Source the helpers for use with the script
 source $HELPER_SCRIPTS/install.sh
 
-# Install jq (needed for JSON parsing)
-apt-get update && apt-get install -y jq
+# Download KIND
+kind_url=$(resolve_github_release_asset_url "kubernetes-sigs/kind" "endswith(\"kind-linux-amd64\")" "latest")
+kind_binary_path=$(download_with_retry "${kind_url}")
 
-# Download and install KIND
-kind_version=$(curl -s https://api.github.com/repos/kubernetes-sigs/kind/releases/latest | jq -r .tag_name)
-kind_url="https://github.com/kubernetes-sigs/kind/releases/download/${kind_version}/kind-linux-amd64"
-kind_checksum_url="${kind_url}.sha256sum"
+# Supply chain security - KIND
+kind_external_hash=$(get_checksum_from_url "${kind_url}.sha256sum" "kind-linux-amd64" "SHA256")
+use_checksum_comparison "${kind_binary_path}" "${kind_external_hash}"
 
-curl -fsSL -o kind "${kind_url}"
-chmod +x kind
+# Install KIND
+install "${kind_binary_path}" /usr/local/bin/kind
 
-# Fetch checksum and validate
-kind_checksum=$(curl -fsSL "${kind_checksum_url}" | awk '{print $1}')
-echo "${kind_checksum}  kind" | sha256sum --check --status || { echo "❌ KIND checksum validation failed!"; exit 1; }
-
-install kind /usr/local/bin/kind
-
-# Install kubectl
-kubectl_version=$(curl -fsSL "https://dl.k8s.io/release/stable.txt")
-kubectl_url="https://dl.k8s.io/release/${kubectl_version}/bin/linux/amd64/kubectl"
-kubectl_checksum_url="${kubectl_url}.sha256"
-
-curl -fsSL -o kubectl "${kubectl_url}"
-chmod +x kubectl
-
-# Validate kubectl checksum
-kubectl_checksum=$(curl -fsSL "${kubectl_checksum_url}")
-echo "${kubectl_checksum}  kubectl" | sha256sum --check --status || { echo "❌ kubectl checksum validation failed!"; exit 1; }
-
-install kubectl /usr/local/bin/kubectl
+## Install kubectl
+kubectl_minor_version=$(curl -fsSL "https://dl.k8s.io/release/stable.txt" | cut -d'.' -f1,2 )
+curl -fsSL https://pkgs.k8s.io/core:/stable:/$kubectl_minor_version/deb/Release.key | sudo gpg --dearmor -o /etc/apt/keyrings/kubernetes-apt-keyring.gpg
+echo 'deb [signed-by=/etc/apt/keyrings/kubernetes-apt-keyring.gpg] https://pkgs.k8s.io/core:/stable:/'$kubectl_minor_version'/deb/ /' | sudo tee /etc/apt/sources.list.d/kubernetes.list
+apt-get update
+apt-get install kubectl
+rm -f /etc/apt/sources.list.d/kubernetes.list
 
 # Install Helm
 curl -fsSL https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 | bash
 
-# Download and install minikube
-minikube_version=$(curl -s https://api.github.com/repos/kubernetes/minikube/releases/latest | jq -r .tag_name)
-minikube_url="https://github.com/kubernetes/minikube/releases/download/${minikube_version}/minikube-linux-amd64"
-minikube_checksum_url="${minikube_url}.sha256"
+# Temporarily pinning the version
+# Download minikube
+curl -fsSL -O https://storage.googleapis.com/minikube/releases/v1.34.0/minikube-linux-amd64
 
-curl -fsSL -o minikube "${minikube_url}"
-chmod +x minikube
+# Supply chain security - minikube
+minikube_hash=$(get_checksum_from_github_release "kubernetes/minikube" "linux-amd64" "1.34.0" "SHA256")
+use_checksum_comparison "minikube-linux-amd64" "${minikube_hash}"
 
-# Validate minikube checksum
-minikube_checksum=$(curl -fsSL "${minikube_checksum_url}")
-echo "${minikube_checksum}  minikube" | sha256sum --check --status || { echo "❌ Minikube checksum validation failed!"; exit 1; }
-
-install minikube /usr/local/bin/minikube
+# Install minikube
+install minikube-linux-amd64 /usr/local/bin/minikube
 
 # Install kustomize
-kustomize_url="https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
-curl -fsSL "$kustomize_url" | bash
+download_url="https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"
+curl -fsSL "$download_url" | bash
 mv kustomize /usr/local/bin
 
 invoke_tests "Tools" "Kubernetes tools"
-
-echo "✅ All Kubernetes tools installed successfully!"
