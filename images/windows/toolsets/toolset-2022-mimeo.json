@@ -154,7 +154,7 @@
         "subversion" : "17",
         "edition" : "Enterprise",
         "channel": "release",
-        "signature": "C2048FB509F1C37A8C3E9EC6648118458AA01780",
+        "signature": "245D262748012A4FE6CE8BA6C951A4C4AFBC3E5D",
         "workloads": [
             "Component.Dotfuscator",
             "Component.Linux.CMake",
