@@ -1,43 +1,23 @@
 #!/bin/bash -e
 ################################################################################
-##  File:  install-kotlin.sh
-##  Desc:  Install Kotlin
-##  Supply chain security: Kotlin - checksum validation
+##  File:  install-heroku.sh
+##  Desc:  Install Heroku CLI. Based on instructions found here: https://devcenter.heroku.com/articles/heroku-cli
 ################################################################################
 
-# Source the helpers for use with the script
-source $HELPER_SCRIPTS/install.sh
+REPO_URL="https://cli-assets.heroku.com/channels/stable/apt"
+GPG_KEY="/usr/share/keyrings/heroku.gpg"
+REPO_PATH="/etc/apt/sources.list.d/heroku.list"
 
-KOTLIN_ROOT="/usr/share/kotlin"
-BIN_PATH="/usr/local/bin"
+# add heroku repository to apt
+curl -fsSL "${REPO_URL}/release.key" | gpg --dearmor -o $GPG_KEY
+echo "deb [trusted=yes] $REPO_URL ./" > $REPO_PATH
 
-# Fetch the latest Kotlin compiler release
-download_url=$(resolve_github_release_asset_url "JetBrains/kotlin" "contains(\"kotlin-compiler\") and endswith(\".zip\")" "latest")
-archive_path=$(download_with_retry "$download_url")
+# install heroku
+apt-get update
+apt-get install heroku
 
-# Supply chain security - Kotlin checksum validation
-kotlin_hash_file=$(download_with_retry "${download_url}.sha256")
-kotlin_hash=$(cat "$kotlin_hash_file")
-use_checksum_comparison "$archive_path" "$kotlin_hash"
+# remove heroku's apt repository
+rm $REPO_PATH
+rm $GPG_KEY
 
-# Extract Kotlin to the target location
-mkdir -p "$KOTLIN_ROOT"
-unzip -qq "$archive_path" -d "$KOTLIN_ROOT"
-rm "$KOTLIN_ROOT/kotlinc/bin/"*.bat
-
-# Ensure all Kotlin binaries are symlinked properly
-for file in "$KOTLIN_ROOT/kotlinc/bin/"*; do
-    ln -sf "$file" "$BIN_PATH/$(basename "$file")"
-done
-
-# Verify that binaries are in the PATH
-echo "Verifying Kotlin installation:"
-command -v kotlin || echo "Kotlin binary not found!"
-command -v kotlinc || echo "Kotlinc binary not found!"
-command -v kapt || echo "Kapt binary not found!"
-command -v kotlin-dce-js || echo "kotlin-dce-js binary not found!"
-
-# Run tests to ensure everything works
-invoke_tests "Tools" "Kotlin"
-
-
+invoke_tests "Tools" "Heroku"
