@@ -5,23 +5,20 @@
 ################################################################################
 
 REPO_URL="https://cli-assets.heroku.com/channels/stable/apt"
-GPG_KEY="/usr/share/keyrings/heroku-archive-keyring.gpg"
+GPG_KEY="/usr/share/keyrings/heroku.gpg"
 REPO_PATH="/etc/apt/sources.list.d/heroku.list"
 
-# Add Heroku GPG key
-curl -fsSL "${REPO_URL}/release.key" | gpg --dearmor | sudo tee $GPG_KEY > /dev/null
+# add heroku repository to apt
+curl -fsSL "${REPO_URL}/release.key" | gpg --dearmor -o $GPG_KEY
+echo "deb [trusted=yes] $REPO_URL ./" > $REPO_PATH
 
-# Add Heroku repository to apt sources
-echo "deb [signed-by=$GPG_KEY] $REPO_URL ./" | sudo tee $REPO_PATH
+# install heroku
+apt-get update
+apt-get install heroku
 
-# Install Heroku CLI
-sudo apt-get update
-sudo apt-get install -y heroku
+# remove heroku's apt repository
+rm $REPO_PATH
+rm $GPG_KEY
 
-# Clean up Heroku's apt repository files
-sudo rm -f $REPO_PATH
-sudo rm -f $GPG_KEY
-
-# Test installation
-heroku --version
+invoke_tests "Tools" "Heroku"
 
