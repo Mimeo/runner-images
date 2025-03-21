@@ -402,7 +402,15 @@ Describe "yq" {
 
 Describe "Kotlin" -Skip:((-not (Test-IsUbuntu20)) -and (-not (Test-IsUbuntu22))) {
     It "kapt" {
-        "kapt -version" | Should -ReturnZeroExitCode
+        try {
+            $kaptOutput = & kapt -Kapt-mode=stubsAndApt -version
+            if ($LASTEXITCODE -ne 0) {
+                throw "KAPT failed with exit code $LASTEXITCODE"
+            }
+        } catch {
+            Write-Error "KAPT execution failed"
+            exit 1
+        }
     }
 
     It "kotlin" {
@@ -418,6 +426,7 @@ Describe "Kotlin" -Skip:((-not (Test-IsUbuntu20)) -and (-not (Test-IsUbuntu22)))
     }
 
     It "kotlin-dce-js (deprecated, skipping)" -Skip {
-    "kotlin-dce-js -version" | Should -ReturnZeroExitCode
+        "kotlin-dce-js -version" | Should -ReturnZeroExitCode
     }
 }
+
