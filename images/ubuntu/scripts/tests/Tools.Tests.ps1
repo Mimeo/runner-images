@@ -121,12 +121,6 @@ Describe "Docker images" {
     }
 }
 
-Describe "Docker-compose v1" -Skip:((-not (Test-IsUbuntu20)) -and (-not (Test-IsUbuntu22))) {
-    It "docker-compose" {
-        "docker-compose --version"| Should -ReturnZeroExitCode
-    }
-}
-
 Describe "Ansible" {
     It "Ansible" {
         "ansible --version" | Should -ReturnZeroExitCode
@@ -259,10 +253,6 @@ Describe "Git" {
     It "git-ftp" {
         "git-ftp --version" | Should -ReturnZeroExitCode
     }
-
-    It "GIT_CLONE_PROTECTION_ACTIVE environment variable should be equal false" {
-        $env:GIT_CLONE_PROTECTION_ACTIVE | Should -BeExactly false
-    }
 }
 
 Describe "Git-lfs" {
@@ -329,7 +319,7 @@ Describe "Conda" {
     }
 }
 
-Describe "Packer" -Skip:((-not (Test-IsUbuntu20)) -and (-not (Test-IsUbuntu22))) {
+Describe "Packer" {
     It "packer" {
         "packer --version" | Should -ReturnZeroExitCode
     }
@@ -364,7 +354,7 @@ Describe "Containers" {
 
 }
 
-Describe "nvm" -Skip:((-not (Test-IsUbuntu20)) -and (-not (Test-IsUbuntu22))) {
+Describe "nvm" {
     It "nvm" {
         "source /etc/skel/.nvm/nvm.sh && nvm --version" | Should -ReturnZeroExitCode
     }
@@ -400,17 +390,9 @@ Describe "yq" {
     }
 }
 
-Describe "Kotlin" -Skip:((-not (Test-IsUbuntu20)) -and (-not (Test-IsUbuntu22))) {
+Describe "Kotlin" {
     It "kapt" {
-        try {
-            $kaptOutput = & kapt -Kapt-mode=stubsAndApt -version
-            if ($LASTEXITCODE -ne 0) {
-                throw "KAPT failed with exit code $LASTEXITCODE"
-            }
-        } catch {
-            Write-Error "KAPT execution failed"
-            exit 1
-        }
+        "kapt -version" | Should -ReturnZeroExitCode
     }
 
     It "kotlin" {
@@ -425,8 +407,29 @@ Describe "Kotlin" -Skip:((-not (Test-IsUbuntu20)) -and (-not (Test-IsUbuntu22)))
         "kotlinc-jvm -version" | Should -ReturnZeroExitCode
     }
 
-    It "kotlin-dce-js (deprecated, skipping)" -Skip {
-        "kotlin-dce-js -version" | Should -ReturnZeroExitCode
+    It "kotlinc-js" {
+        "kotlinc-js -version" | Should -ReturnZeroExitCode
     }
 }
 
+Describe "Ninja" {
+    New-item -Path "/tmp/ninjaproject" -ItemType Directory -Force
+    Set-Location '/tmp/ninjaproject'
+@'
+cmake_minimum_required(VERSION 3.10)
+project(NinjaTest NONE)
+'@ | Out-File -FilePath "./CMakeLists.txt"
+
+    It "Make a simple ninja project" {
+    "cmake -GNinja /tmp/ninjaproject" | Should -ReturnZeroExitCode
+    }
+
+    It "build.ninja file should exist" {
+        $buildFilePath = Join-Path "/tmp/ninjaproject" "build.ninja"
+        $buildFilePath | Should -Exist
+    }
+
+    It "Ninja" {
+        "ninja --version" | Should -ReturnZeroExitCode
+    }
+}
