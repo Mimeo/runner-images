@@ -1,7 +1,4 @@
-trigger:
-  branches:
-    include:
-    - '*' 
+
 
 pool:
   name: mimeo-win2022-vmss
