@@ -26,10 +26,6 @@ Describe "Toolset" {
             tools = @("codeql/codeql")
             command = "version"
         }
-       Sbt = @{
-            tools = @("bin/sbt")
-            command = "--version"
-        }
     }
 
     foreach ($tool in $tools) {
