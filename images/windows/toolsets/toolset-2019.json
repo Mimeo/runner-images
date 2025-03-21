@@ -6,7 +6,9 @@
             "platform" : "win32",
             "versions": [
                 "3.0",
-                "3.1"
+                "3.1",
+                "3.2",
+                "3.3"
             ],
             "default": "3.0"
         },
@@ -16,14 +18,14 @@
             "arch": "x64",
             "platform" : "win32",
             "versions": [
-                "3.7.*",
                 "3.8.*",
                 "3.9.*",
                 "3.10.*",
                 "3.11.*",
-                "3.12.*"
+                "3.12.*",
+                "3.13.*"
             ],
-            "default": "3.7.*"
+            "default": "3.9.*"
         },
         {
             "name": "Python",
@@ -31,12 +33,12 @@
             "arch": "x86",
             "platform" : "win32",
             "versions": [
-                "3.7.*",
                 "3.8.*",
                 "3.9.*",
                 "3.10.*",
                 "3.11.*",
-                "3.12.*"
+                "3.12.*",
+                "3.13.*"
             ]
         },
         {
@@ -60,7 +62,8 @@
             "versions": [
                 "16.*",
                 "18.*",
-                "20.*"
+                "20.*",
+                "22.*"
             ]
         },
         {
@@ -71,7 +74,8 @@
             "versions": [
                 "1.20.*",
                 "1.21.*",
-                "1.22.*"
+                "1.22.*",
+                "1.23.*"
             ],
             "default": "1.21.*"
         }
@@ -83,43 +87,16 @@
         {"name": "PowerShellGet"},
         {"name": "PSScriptAnalyzer"},
         {"name": "PSWindowsUpdate"},
-        {"name": "SqlServer"},
+        {"name": "SqlServer", "versions": ["22.2.0"]},
         {"name": "VSSetup"},
         {"name": "Microsoft.Graph"},
         {"name": "AWSPowershell"}
     ],
     "azureModules": [
         {
-            "name": "azurerm",
-            "versions": [
-                "2.1.0",
-                "6.13.1"
-            ],
-            "zip_versions": [
-                "3.8.0",
-                "4.2.1",
-                "5.1.1",
-                "6.7.0"
-            ],
-            "default": "2.1.0"
-        },
-        {
-            "name": "azure",
-            "versions": [
-                "2.1.0",
-                "5.3.0"
-            ],
-            "zip_versions": [
-                "3.8.0",
-                "4.2.1",
-                "5.1.1"
-            ],
-            "default": "2.1.0"
-        },
-        {
             "name": "az",
             "versions": [
-                "11.3.1"
+                "12.1.0"
             ],
             "zip_versions": [
             ]
@@ -137,11 +114,7 @@
         "extras": [
             "android;m2repository",
             "google;m2repository",
-            "google;google_play_services",
-            "m2repository;com;android;support;constraint;constraint-layout-solver;1.0.2",
-            "m2repository;com;android;support;constraint;constraint-layout-solver;1.0.1",
-            "m2repository;com;android;support;constraint;constraint-layout;1.0.2",
-            "m2repository;com;android;support;constraint;constraint-layout;1.0.1"
+            "google;google_play_services"
         ],
         "addons": [
             "addon-google_apis-google-24",
@@ -150,14 +123,14 @@
             "addon-google_apis-google-21"
         ],
         "additional_tools": [
-            "cmake;3.10.2.4988404",
             "cmake;3.18.1",
-            "cmake;3.22.1"
+            "cmake;3.22.1",
+            "cmake;3.31.5"
         ],
         "ndk": {
-            "default": "25",
+            "default": "27",
             "versions": [
-                "24", "25", "26"
+                "26" , "27", "28"
             ]
         }
     },
@@ -250,7 +223,9 @@
         "subversion" : "16",
         "edition" : "Enterprise",
         "channel": "release",
-        "signature": "C2048FB509F1C37A8C3E9EC6648118458AA01780",
+        "signature": [
+                      "8F985BE8FD256085C90A95D3C74580511A1DB975" 
+                    ],
         "workloads": [
             "Component.Dotfuscator",
             "Component.Linux.CMake",
@@ -268,7 +243,6 @@
             "Microsoft.VisualStudio.Component.AspNet45",
             "Microsoft.VisualStudio.Component.Azure.Kubernetes.Tools",
             "Microsoft.VisualStudio.Component.Azure.ServiceFabric.Tools",
-            "Microsoft.VisualStudio.Component.Azure.Storage.AzCopy",
             "Microsoft.VisualStudio.Component.Debugger.JustInTime",
             "Microsoft.VisualStudio.Component.DslTools",
             "Microsoft.VisualStudio.Component.EntityFramework",
@@ -369,9 +343,9 @@
             "mcr.microsoft.com/dotnet/framework/sdk:4.8-windowsservercore-ltsc2019"
         ],
         "components": {
-            "docker": "24.0.7",
-            "compose": "2.23.3"
-        }   
+            "docker": "27.5.1",
+            "compose": "2.32.2"
+        }
     },
     "pipx": [
         {
@@ -410,8 +384,8 @@
     "dotnet": {
         "versions": [
             "6.0",
-            "7.0",
-            "8.0"
+            "8.0",
+            "9.0"
         ],
         "tools": [
             { "name": "nbgv", "test": "nbgv --version", "getversion": "nbgv --version" }
@@ -421,10 +395,10 @@
     "choco": {
         "common_packages": [
             { "name": "7zip.install" },
-            { "name": "aria2" },
             { "name": "azcopy10" },
+            { "name": "aria2" },
             { "name": "Bicep" },
-            { "name": "gitversion.portable" },
+            { "name": "gitversion.portable"},
             { "name": "innosetup" },
             { "name": "jq" },
             { "name": "NuGet.CommandLine" },
@@ -434,7 +408,6 @@
                 "args": [ "--version", "5.32.1.1" ]
             },
             { "name": "pulumi" },
-            { "name": "tortoisesvn" },
             { "name": "swig" },
             { "name": "vswhere" },
             {
@@ -445,14 +418,15 @@
                 "name": "cmake.install",
                 "args": [ "--installargs", "ADD_CMAKE_TO_PATH=\"System\"" ]
             },
-            { "name": "imagemagick" }
+            { "name": "imagemagick" },
+            { "name": "ninja" }
         ]
     },
     "node": {
-        "default": "18"
+        "default": "18.*"
     },
     "maven": {
-        "version": "3.8"
+        "version": "3.9"
     },
     "mysql": {
         "version": "5.7",
@@ -460,26 +434,33 @@
     },
     "mongodb": {
         "version": "5.0",
-        "signature": "F2D7C28591847BB2CB2B1C2A0C59459FDC728A38"
+        "signature": "A5BBE2A6DA1D2A6E057EF870267E6A91E4D56BAA"
     },
     "nsis": {
         "version": "3.10"
     },
     "php": {
-        "version": "8.3"
+        "version": "8.4"
     },
     "llvm": {
-        "version": "16"
+        "version": "18"
     },
     "postgresql": {
+        "signature": "698BA51AA27CC31282AACA5055E4B9190BC6C0E9",
         "version": "14",
-        "signature": "698BA51AA27CC31282AACA5055E4B9190BC6C0E9"
+        "vcRedistSignature": "8F985BE8FD256085C90A95D3C74580511A1DB975",
+        "installVcRedist": true
     },
     "kotlin": {
         "version": "latest"
     },
     "openssl": {
-        "version": "1.1.1"
+        "version": "1.1.1",
+        "pinnedDetails": {
+            "link": "https://github.com/somelink",
+            "reason": "this was pinned due to a downstream issue with the installer",
+            "review-at": "2025-01-30"
+        }
     },
     "pwsh": {
         "version": "7.4"

@@ -11,7 +11,7 @@ Install-ChocoPackage awscli
 Install-Binary `
     -Url "https://s3.amazonaws.com/session-manager-downloads/plugin/latest/windows/SessionManagerPluginSetup.exe" `
     -InstallArgs ("/silent", "/install") `
-    -ExpectedSignature "FF457E5732E98A9F156E657F8CC7C4432507C3BB"
+    -ExpectedSignature "CFC0CE0547A698E5F3FA78F819654CE016D76464"
 $env:Path = $env:Path + ";$env:ProgramFiles\Amazon\SessionManagerPlugin\bin"
 
 # Install AWS SAM CLI
